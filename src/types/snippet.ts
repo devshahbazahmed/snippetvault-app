@@ -11,3 +11,7 @@ export type Snippets = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type SnippetRow = Omit<Snippets, 'tags'> & {
+  tags: string;
+};

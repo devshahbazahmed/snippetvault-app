@@ -1,146 +1,62 @@
-import { SymbolView } from 'expo-symbols';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Header from '../../components/Header';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
-const LANGUAGES = ['All', 'JavaScript', 'Python', 'TypeScript'];
+import { getAllSnippets } from '@/db/snippets';
+import type { Snippets } from '@/types/snippet';
+import SnippetCard from '../../components/SnippetCard';
 
-const SNIPPETS = [
-  {
-    id: '1',
-    language: 'JAVASCRIPT',
-    title: 'Async Fetch Wrapper',
-    code: `const fetchData = async (url) => {
-  const response = await fetch(url);
-  return response.json();
-};`,
-    time: '2 HOURS AGO',
-  },
-  {
-    id: '2',
-    language: 'PYTHON',
-    title: 'List Comprehension Map',
-    code: `def format_users(users):
-  return [user.name.title()
-          for user in users]`,
-    time: '5 HOURS AGO',
-  },
-  {
-    id: '3',
-    language: 'RUST',
-    title: 'Safe Option Unwrap',
-    code: `fn main() {
-  let x: Option<&str> = None;
-  let val = x.unwrap_or("default");
-}`,
-    time: 'YESTERDAY',
-  },
-  {
-    id: '4',
-    language: 'TYPESCRIPT',
-    title: 'Generic Interface',
-    code: `interface Response<T> {
-  data: T;
-  status: number;
-}`,
-    time: '2 DAYS AGO',
-  },
-];
+export default function HomeScreen() {
+  const [snippets, setSnippets] = useState<Snippets[]>([]);
 
-export default function Home() {
-  return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
-      >
-        <Header />
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Languages</Text>
-          <Pressable>
-            <Text style={styles.viewAll}>VIEW ALL →</Text>
-          </Pressable>
-        </View>
+  async function loadSnippets() {
+    const data = await getAllSnippets();
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.chips}
-        >
-          {LANGUAGES.map((language, index) => (
-            <Pressable
-              key={language}
-              style={[styles.chip, index === 0 && styles.activeChip]}
-            >
-              <Text
-                style={[styles.chipText, index === 0 && styles.activeChipText]}
-              >
-                {language.toUpperCase()}
-              </Text>
-            </Pressable>
-          ))}
-        </ScrollView>
+    const parsed = data.map((snippet) => ({
+      ...snippet,
+      tags:
+        typeof snippet.tags === 'string'
+          ? JSON.parse(snippet.tags)
+          : snippet.tags,
+    }));
 
-        <Text style={[styles.sectionTitle, { marginTop: 28 }]}>
-          Recent Snippets
-        </Text>
+    setSnippets(parsed);
+  }
 
-        <View style={styles.snippetList}>
-          {SNIPPETS.map((snippet) => (
-            <SnippetCard key={snippet.id} snippet={snippet} />
-          ))}
-        </View>
-      </ScrollView>
-
-      <Pressable style={styles.fab}>
-        <SymbolView
-          name="plus"
-          size={30}
-          tintColor="#140E22"
-          weight="semibold"
-        />
-      </Pressable>
-    </SafeAreaView>
+  useFocusEffect(
+    useCallback(() => {
+      loadSnippets();
+    }, [])
   );
-}
 
-function SnippetCard({
-  snippet,
-}: {
-  snippet: {
-    language: string;
-    title: string;
-    code: string;
-    time: string;
-  };
-}) {
   return (
-    <View style={styles.card}>
-      <View style={styles.cardTop}>
-        <Text style={styles.language}>{snippet.language}</Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>SnippetVault</Text>
 
-        <SymbolView name="star" size={22} tintColor="#D4D4D8" />
+        <Text style={styles.subtitle}>Your saved code snippets</Text>
       </View>
 
-      <Text style={styles.cardTitle}>{snippet.title}</Text>
+      <FlatList
+        data={snippets}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.list}
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text style={styles.emptyText}>No snippets yet</Text>
 
-      <View style={styles.codeBlock}>
-        <Text style={styles.code}>{snippet.code}</Text>
-      </View>
+            <Text style={styles.emptySubtext}>
+              Tap + to create your first snippet
+            </Text>
+          </View>
+        }
+        renderItem={({ item }) => <SnippetCard snippet={item} />}
+      />
 
-      <View style={styles.cardBottom}>
-        <Text style={styles.time}>{snippet.time}</Text>
-
-        <View style={styles.cardActions}>
-          <SymbolView name="doc.on.doc" size={20} tintColor="#D4D4D8" />
-
-          <SymbolView
-            name="square.and.arrow.up"
-            size={20}
-            tintColor="#D4D4D8"
-          />
-        </View>
-      </View>
+      <Pressable style={styles.fab} onPress={() => router.push('/snippet/new')}>
+        <Ionicons name="add" size={28} color="#fff" />
+      </Pressable>
     </View>
   );
 }
@@ -151,137 +67,65 @@ const styles = StyleSheet.create({
     backgroundColor: '#050B1A',
   },
 
-  content: {
+  header: {
+    paddingTop: 72,
     paddingHorizontal: 20,
-    paddingTop: 64,
-    paddingBottom: 160,
+    marginBottom: 20,
   },
 
-  sectionHeader: {
-    marginTop: 36,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-
-  sectionTitle: {
-    fontSize: 18,
+  title: {
+    fontSize: 32,
     fontWeight: '700',
-    color: '#F4F4F5',
-  },
-
-  viewAll: {
-    color: '#C4B5FD',
-    fontSize: 12,
-    fontWeight: '600',
-    letterSpacing: 1,
-  },
-
-  chips: {
-    marginTop: 18,
-    gap: 12,
-  },
-
-  chip: {
-    backgroundColor: '#1C2235',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 18,
-  },
-
-  activeChip: {
-    backgroundColor: '#8B5CF6',
-  },
-
-  chipText: {
-    color: '#D4D4D8',
-    fontSize: 12,
-    fontWeight: '600',
-    letterSpacing: 1,
-  },
-
-  activeChipText: {
     color: '#fff',
   },
 
-  snippetList: {
-    marginTop: 20,
-    gap: 20,
+  subtitle: {
+    color: '#A1A1AA',
+    marginTop: 6,
+    fontSize: 15,
   },
 
-  card: {
-    backgroundColor: '#111827',
-    borderRadius: 24,
-    padding: 20,
-  },
-
-  cardTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  list: {
+    paddingHorizontal: 20,
+    paddingBottom: 140,
+    gap: 14,
   },
 
   language: {
-    color: '#38BDF8',
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 1,
-  },
-
-  cardTitle: {
-    color: '#F9FAFB',
-    fontSize: 24,
-    fontWeight: '700',
-    marginTop: 14,
-  },
-
-  codeBlock: {
-    marginTop: 16,
-    backgroundColor: '#020617',
-    borderRadius: 14,
-    padding: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: '#C4B5FD',
-  },
-
-  code: {
-    color: '#E4E4E7',
-    fontFamily: 'monospace',
-    fontSize: 14,
-    lineHeight: 22,
-  },
-
-  cardBottom: {
-    marginTop: 18,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-
-  time: {
-    color: '#A1A1AA',
-    fontSize: 12,
+    marginTop: 8,
+    color: '#8B5CF6',
     fontWeight: '600',
-    letterSpacing: 1,
   },
 
-  cardActions: {
-    flexDirection: 'row',
-    gap: 12,
+  empty: {
+    alignItems: 'center',
+    marginTop: 120,
+  },
+
+  emptyText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+
+  emptySubtext: {
+    color: '#71717A',
+    marginTop: 8,
   },
 
   fab: {
     position: 'absolute',
     right: 24,
     bottom: 110,
-    width: 64,
-    height: 64,
-    borderRadius: 20,
+
+    width: 60,
+    height: 60,
+
+    borderRadius: 999,
+
     backgroundColor: '#8B5CF6',
-    justifyContent: 'center',
+
     alignItems: 'center',
-    shadowColor: '#8B5CF6',
-    shadowOpacity: 0.35,
-    shadowRadius: 18,
-    elevation: 8,
+    justifyContent: 'center',
   },
 });
