@@ -130,3 +130,17 @@ export async function getFavoriteSnippets() {
     favorite: Boolean(row.isFavourite),
   }));
 }
+
+export async function updateSnippetScreenshot(
+  id: string,
+  screenshotUri: string | null
+) {
+  await db.runAsync(
+    `
+      UPDATE snippets
+      SET screenshotUri = ?
+      WHERE id = ?
+    `,
+    [screenshotUri, id]
+  );
+}

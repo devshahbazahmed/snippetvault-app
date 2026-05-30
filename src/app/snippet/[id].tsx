@@ -10,6 +10,11 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Image } from 'react-native';
+
+import { pickAndSaveScreenshot } from '@/lib/attachments';
+
+import { updateSnippetScreenshot } from '@/db/snippets';
 
 import { deleteSnippet, getSnippetById, toggleFavorite } from '@/db/snippets';
 import { exportSnippet } from '@/lib/export-snippet';
@@ -20,6 +25,21 @@ export default function SnippetDetailScreen() {
   const { id } = useLocalSearchParams();
 
   const [snippet, setSnippet] = useState<any>(null);
+
+  async function handleAttachScreenshot() {
+    if (!snippet) return;
+
+    const uri = await pickAndSaveScreenshot(snippet.id);
+
+    if (!uri) return;
+
+    await updateSnippetScreenshot(snippet.id, uri);
+
+    setSnippet({
+      ...snippet,
+      screenshotUri: uri,
+    });
+  }
 
   async function loadSnippet() {
     const data = await getSnippetById(String(id));
@@ -155,6 +175,11 @@ export default function SnippetDetailScreen() {
       </Pressable>
 
       <View style={styles.actionsRow}>
+        <ActionButton
+          icon="image-outline"
+          label="Screenshot"
+          onPress={handleAttachScreenshot}
+        />
         <ActionButton
           icon="download-outline"
           label="Export"
