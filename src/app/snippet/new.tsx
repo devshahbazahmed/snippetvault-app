@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
   },
 
   languageChipActive: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: 'darkblue',
   },
 
   languageText: {
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: 'darkblue',
     marginTop: 24,
     paddingVertical: 16,
     borderRadius: 18,

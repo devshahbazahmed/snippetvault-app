@@ -17,11 +17,7 @@ export function SettingsRow({
   return (
     <Pressable style={styles.row} onPress={onPress}>
       <View style={[styles.iconBox, danger && styles.iconBoxDanger]}>
-        <Ionicons
-          name={icon}
-          size={20}
-          color={danger ? '#F87171' : '#8B5CF6'}
-        />
+        <Ionicons name={icon} size={20} color={danger ? '#F87171' : 'cyan'} />
       </View>
 
       <View style={{ flex: 1 }}>

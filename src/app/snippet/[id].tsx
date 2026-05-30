@@ -10,7 +10,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import { Image } from 'react-native';
 
 import { pickAndSaveScreenshot } from '@/lib/attachments';
 
@@ -315,7 +314,7 @@ const styles = StyleSheet.create({
   aiButtonText: {
     fontWeight: '700',
     fontSize: 18,
-    color: '#4C1D95',
+    color: 'darkblue',
   },
 
   actionsRow: {

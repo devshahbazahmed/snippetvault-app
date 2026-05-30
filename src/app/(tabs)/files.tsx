@@ -224,11 +224,7 @@ export default function FilesScreen() {
               }
             >
               <View style={styles.fileIcon}>
-                <Ionicons
-                  name="document-text-outline"
-                  size={22}
-                  color="#8B5CF6"
-                />
+                <Ionicons name="document-text-outline" size={22} color="cyan" />
               </View>
 
               <View
@@ -330,7 +326,7 @@ const styles = StyleSheet.create({
     width: '35%',
     height: '100%',
 
-    backgroundColor: '#8B5CF6',
+    backgroundColor: 'darkblue',
 
     borderRadius: 999,
   },
@@ -354,7 +350,7 @@ const styles = StyleSheet.create({
   },
 
   filterChipActive: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: 'darkblue',
   },
 
   filterText: {

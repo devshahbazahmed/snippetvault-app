@@ -1,56 +1,95 @@
-# Welcome to your Expo app 👋
+# SnippetVault
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+SnippetVault is a local-first Expo app for saving, searching, editing, exporting, and organizing code snippets on mobile. It uses Expo Router for navigation, Expo SQLite for persistent snippet storage, and Expo FileSystem for exported snippets and attachments.
 
-## Get started
+## Features
 
-1. Install dependencies
+- Create, edit, delete, and view code snippets.
+- Search snippets by title, language, code, or tag.
+- Mark important snippets as favourites.
+- Copy snippet code to the clipboard.
+- Attach screenshots from the device media library.
+- Export snippets to local storage.
+- Browse, share, rename, and delete exported local files.
+- Track basic snippet and storage stats.
+- Persist simple preferences such as theme, code wrapping, and font size.
 
-   ```bash
-   npm install
-   ```
+## Tech Stack
 
-2. Start the app
+- Expo SDK 55
+- React 19 and React Native 0.83
+- Expo Router
+- Expo SQLite
+- Expo FileSystem
+- Expo Image Picker
+- Expo Sharing
+- TypeScript
 
-   ```bash
-   npx expo start
-   ```
+## Requirements
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Expo SDK 55 requires Node.js 20.19.x or newer. Install dependencies with the package manager used by the lockfile:
 
 ```bash
-npm run reset-project
+pnpm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+You can also use another package manager, but keep the lockfile consistent for the project.
 
-### Other setup steps
+## Running the App
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Start the Expo development server:
 
-## Learn more
+```bash
+pnpm start
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Then choose a target from the Expo CLI prompt, or run one directly:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+pnpm ios
+pnpm android
+pnpm web
+```
 
-## Join the community
+The app is configured for portrait orientation and uses the `snippetvault://` scheme.
 
-Join our community of developers creating universal apps.
+## Project Structure
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```text
+src/
+  app/                 Expo Router routes and screens
+    (tabs)/            Home, favourites, files, and settings tabs
+    snippet/           New, detail, and edit snippet screens
+  components/          Shared UI components
+  db/                  SQLite setup and snippet queries
+  lib/                 File, backup, export, stats, attachment, and preference helpers
+  types/               Shared TypeScript types
+assets/                Icons, splash assets, and images
+```
+
+## Data and Storage
+
+Snippet data is stored locally in `snippetvault.db` using Expo SQLite. Exported snippets and screenshots are written under the app document directory in a `snippetvault` folder:
+
+- `exports/` for exported snippet files
+- `screenshots/` for attached snippet screenshots
+- `backups/` for backup files
+
+No remote API or account system is required.
+
+## Useful Scripts
+
+```bash
+pnpm start      # Start Expo
+pnpm ios        # Start Expo for iOS simulator
+pnpm android    # Start Expo for Android emulator
+pnpm web        # Start Expo for web
+pnpm lint       # Run Expo lint
+```
+
+## Development Notes
+
+- The app initializes the SQLite schema in `src/app/_layout.tsx`.
+- Snippet CRUD and favourite state live in `src/db/snippets.ts`.
+- File exports and the local file browser use helpers in `src/lib/files.ts` and `src/lib/export-snippet.ts`.
+- Backup and restore UI exists in settings, but backup content is currently minimal and restore behavior is not yet wired up.

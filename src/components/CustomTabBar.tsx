@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   },
 
   activeTab: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: 'darkblue',
   },
   label: {
     marginTop: 4,

@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   },
 
   chipActive: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: 'darkblue',
   },
 
   chipText: {
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: 'darkblue',
     marginTop: 24,
     borderRadius: 18,
     paddingVertical: 16,
