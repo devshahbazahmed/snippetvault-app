@@ -11,8 +11,9 @@ import {
   View,
 } from 'react-native';
 
-import { deleteSnippet, getSnippetById } from '@/db/snippets';
+import { deleteSnippet, getSnippetById, toggleFavorite } from '@/db/snippets';
 import ActionButton from '../../components/ActionButton';
+import { Snippets } from '../../types/snippet';
 
 export default function SnippetDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -64,6 +65,18 @@ export default function SnippetDetailScreen() {
   }
 
   if (!snippet) return null;
+  const handleToggleFavorite = async () => {
+    await toggleFavorite(snippet.id);
+
+    setSnippet((prev: Snippets) =>
+      prev
+        ? {
+            ...prev,
+            favorite: !prev.isFavourite,
+          }
+        : null
+    );
+  };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -74,9 +87,19 @@ export default function SnippetDetailScreen() {
 
         <Text style={styles.title}>{snippet.title}</Text>
 
-        <Pressable onPress={handleEdit}>
-          <Ionicons name="create-outline" size={24} color="#fff" />
-        </Pressable>
+        <View style={styles.headerActions}>
+          <Pressable hitSlop={10} onPress={handleToggleFavorite}>
+            <Ionicons
+              name={snippet.isFavourite ? 'star' : 'star-outline'}
+              size={24}
+              color={snippet.isFavourite ? '#FBBF24' : '#fff'}
+            />
+          </Pressable>
+
+          <Pressable hitSlop={10} onPress={handleEdit}>
+            <Ionicons name="create-outline" size={24} color="#fff" />
+          </Pressable>
+        </View>
       </View>
 
       <View style={styles.metaRow}>
@@ -261,5 +284,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     marginTop: 28,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
   },
 });

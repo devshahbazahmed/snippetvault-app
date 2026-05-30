@@ -17,7 +17,7 @@ function getLabel(name: string) {
       return 'Files';
 
     case 'favourites':
-      return 'Stars';
+      return 'Favourites';
 
     case 'settings':
       return 'Settings';

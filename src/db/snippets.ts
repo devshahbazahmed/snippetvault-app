@@ -2,10 +2,21 @@ import { SnippetRow, Snippets } from '../types/snippet';
 import { db } from './index';
 
 export async function getAllSnippets() {
-  return await db.getAllAsync<Snippets>(
-    `SELECT * FROM snippets
-     ORDER BY updatedAt DESC`
+  const rows = await db.getAllAsync<SnippetRow>(
+    `
+      SELECT *
+      FROM snippets
+      ORDER BY updatedAt DESC
+      `
   );
+
+  return rows.map((row) => ({
+    ...row,
+
+    tags: typeof row.tags === 'string' ? JSON.parse(row.tags || '[]') : [],
+
+    favorite: Boolean(row.isFavourite),
+  }));
 }
 
 export async function createSnippet(snippet: Snippets) {
@@ -53,17 +64,22 @@ export async function getSnippetById(id: string) {
   return {
     ...row,
     tags: JSON.parse(row.tags || '[]'),
-  } as Snippets;
+    favorite: Boolean(row.isFavourite),
+  };
 }
 
-export async function toggleFavorite(id: string, favorite: boolean) {
+export async function toggleFavorite(id: string) {
   await db.runAsync(
     `
     UPDATE snippets
-    SET favorite = ?, updatedAt = ?
+    SET favorite =
+      CASE
+        WHEN favorite = 1 THEN 0
+        ELSE 1
+      END
     WHERE id = ?
     `,
-    [Number(favorite), new Date().toISOString(), id]
+    [id]
   );
 }
 
@@ -96,4 +112,21 @@ export async function updateSnippet(
       id,
     ]
   );
+}
+
+export async function getFavoriteSnippets() {
+  const rows = await db.getAllAsync<SnippetRow>(
+    `
+    SELECT *
+    FROM snippets
+    WHERE favorite = 1
+    ORDER BY updatedAt DESC
+    `
+  );
+
+  return rows.map((row) => ({
+    ...row,
+    tags: JSON.parse(row.tags || '[]'),
+    favorite: Boolean(row.isFavourite),
+  }));
 }

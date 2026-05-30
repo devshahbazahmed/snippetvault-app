@@ -1,14 +1,22 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 
-import { getAllSnippets } from '@/db/snippets';
+import { getAllSnippets, toggleFavorite } from '@/db/snippets';
 import type { Snippets } from '@/types/snippet';
 import SnippetCard from '../../components/SnippetCard';
 
 export default function HomeScreen() {
   const [snippets, setSnippets] = useState<Snippets[]>([]);
+  const [search, setSearch] = useState<string>('');
 
   async function loadSnippets() {
     const data = await getAllSnippets();
@@ -24,22 +32,53 @@ export default function HomeScreen() {
     setSnippets(parsed);
   }
 
+  const handleToggleFavorite = async (id: string) => {
+    await toggleFavorite(id);
+
+    setSnippets((prev) =>
+      prev.map((snippet) =>
+        snippet.id === id
+          ? {
+              ...snippet,
+              favorite: !snippet.isFavourite,
+            }
+          : snippet
+      )
+    );
+  };
+
   useFocusEffect(
     useCallback(() => {
       loadSnippets();
     }, [])
   );
 
+  const filteredSnippets = snippets.filter((snippet) => {
+    const query = search.toLowerCase();
+    return (
+      snippet.title.toLowerCase().includes(query) ||
+      snippet.language.toLowerCase().includes(query) ||
+      snippet.code.toLowerCase().includes(query) ||
+      snippet.tags.some((tag) => tag.toLowerCase().includes(query))
+    );
+  });
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>SnippetVault</Text>
-
         <Text style={styles.subtitle}>Your saved code snippets</Text>
+        <TextInput
+          placeholder="Search snippets..."
+          value={search}
+          onChangeText={setSearch}
+          placeholderTextColor="#71717A"
+          style={styles.searchInput}
+        />
       </View>
 
       <FlatList
-        data={snippets}
+        data={filteredSnippets}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
@@ -51,7 +90,9 @@ export default function HomeScreen() {
             </Text>
           </View>
         }
-        renderItem={({ item }) => <SnippetCard snippet={item} />}
+        renderItem={({ item }) => (
+          <SnippetCard snippet={item} onToggleFavorite={handleToggleFavorite} />
+        )}
       />
 
       <Pressable style={styles.fab} onPress={() => router.push('/snippet/new')}>
@@ -117,15 +158,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 24,
     bottom: 110,
-
     width: 60,
     height: 60,
-
     borderRadius: 999,
-
     backgroundColor: '#8B5CF6',
-
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  searchInput: {
+    marginTop: 16,
+    backgroundColor: '#111827',
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    color: '#fff',
+    fontSize: 16,
   },
 });

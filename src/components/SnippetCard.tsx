@@ -1,10 +1,26 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { getAllSnippets } from '../db/snippets';
 import { Snippets } from '../types/snippet';
 
-export default function SnippetCard({ snippet }: { snippet: Snippets }) {
+export default function SnippetCard({
+  snippet,
+  onToggleFavorite,
+}: {
+  snippet: Snippets;
+  onToggleFavorite: (id: string) => void;
+}) {
   const router = useRouter();
+  const [snippets, setSnippets] = useState<Snippets[]>([]);
+  async function loadSnippets() {
+    const data = await getAllSnippets();
+    setSnippets(data);
+  }
+  console.log(snippet.title, snippet.isFavourite);
+  const tags = snippet.tags ?? [];
+
   return (
     <Pressable
       style={styles.card}
@@ -18,15 +34,19 @@ export default function SnippetCard({ snippet }: { snippet: Snippets }) {
       <View style={styles.cardHeader}>
         <Text style={styles.cardTitle}>{snippet.title}</Text>
 
-        {snippet.isFavourite && (
-          <Ionicons name="star" size={18} color="#FBBF24" />
-        )}
+        <Pressable hitSlop={10} onPress={() => onToggleFavorite(snippet.id)}>
+          <Ionicons
+            name={snippet.isFavourite ? 'star' : 'star-outline'}
+            size={22}
+            color={snippet.isFavourite ? '#FBBF24' : '#A1A1AA'}
+          />
+        </Pressable>
       </View>
 
       <Text style={styles.language}>{snippet.language}</Text>
 
       <View style={styles.tags}>
-        {snippet.tags.map((tag) => (
+        {tags.map((tag) => (
           <View key={tag} style={styles.tag}>
             <Text style={styles.tagText}>{tag}</Text>
           </View>
