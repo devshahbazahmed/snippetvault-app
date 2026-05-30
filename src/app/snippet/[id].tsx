@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 
 import { deleteSnippet, getSnippetById, toggleFavorite } from '@/db/snippets';
+import { exportSnippet } from '@/lib/export-snippet';
 import ActionButton from '../../components/ActionButton';
 import { Snippets } from '../../types/snippet';
 
@@ -77,6 +78,14 @@ export default function SnippetDetailScreen() {
         : null
     );
   };
+
+  async function handleExport() {
+    if (!snippet) return;
+
+    await exportSnippet(snippet, 'txt');
+
+    Alert.alert('Exported', 'Snippet saved to local storage');
+  }
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -146,7 +155,11 @@ export default function SnippetDetailScreen() {
       </Pressable>
 
       <View style={styles.actionsRow}>
-        <ActionButton icon="download-outline" label="Export" />
+        <ActionButton
+          icon="download-outline"
+          label="Export"
+          onPress={handleExport}
+        />
 
         <ActionButton icon="share-social-outline" label="Share" />
 

@@ -18,7 +18,6 @@ export default function SnippetCard({
     const data = await getAllSnippets();
     setSnippets(data);
   }
-  console.log(snippet.title, snippet.isFavourite);
   const tags = snippet.tags ?? [];
 
   return (
