@@ -109,141 +109,141 @@ export default function FilesScreen() {
     await shareFile(uri);
   }
 
+  function openFileMenu(item: LocalFile) {
+    Alert.alert(item.name, 'Choose an action', [
+      {
+        text: 'Share',
+        onPress: () => handleShare(item.uri),
+      },
+
+      {
+        text: 'Rename',
+        onPress: () => handleRename(item.uri, item.name),
+      },
+
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => handleDelete(item.uri),
+      },
+
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+    ]);
+  }
+
   return (
     <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <Text style={styles.heading}>Local Storage</Text>
+      <FlatList
+        data={files}
+        keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingBottom: 140,
+        }}
+        ListHeaderComponent={
+          <>
+            <Text style={styles.heading}>Local Storage</Text>
 
-        <View style={styles.searchBox}>
-          <Ionicons name="search" size={18} color="#71717A" />
+            <View style={styles.searchBox}>
+              <Ionicons name="search" size={18} color="#71717A" />
 
-          <TextInput
-            value={search}
-            onChangeText={setSearch}
-            placeholder="Search snippets and folders..."
-            placeholderTextColor="#71717A"
-            style={styles.input}
-          />
-        </View>
-
-        <View style={styles.storageCard}>
-          <View style={styles.storageRow}>
-            <Text style={styles.storageLabel}>STORAGE USED</Text>
-
-            <Text style={styles.storageValue}>Local Files</Text>
-          </View>
-
-          <View style={styles.progressTrack}>
-            <View style={styles.progressFill} />
-          </View>
-
-          <Text style={styles.storageMeta}>SnippetVault local storage</Text>
-        </View>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterRow}
-        >
-          {filters.map((filter) => {
-            const active = activeFilter === filter;
-
-            return (
-              <Pressable
-                key={filter}
-                onPress={() => setActiveFilter(filter)}
-                style={[styles.filterChip, active && styles.filterChipActive]}
-              >
-                <Text
-                  style={[styles.filterText, active && styles.filterTextActive]}
-                >
-                  {filter}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-
-        {filteredFolders.map((folder) => (
-          <Pressable key={folder.id} style={styles.folderCard}>
-            <View style={styles.folderIcon}>
-              <Ionicons name="folder" size={28} color="#4DD0E1" />
+              <TextInput
+                value={search}
+                onChangeText={setSearch}
+                placeholder="Search snippets and folders..."
+                placeholderTextColor="#71717A"
+                style={styles.input}
+              />
             </View>
 
-            <View
-              style={{
-                flex: 1,
-              }}
-            >
-              <Text style={styles.folderTitle}>{folder.name}</Text>
+            <View style={styles.storageCard}>
+              <View style={styles.storageRow}>
+                <Text style={styles.storageLabel}>STORAGE USED</Text>
 
-              <Text style={styles.folderMeta}>
-                {folder.items} items • {folder.updated}
+                <Text style={styles.storageValue}>Local Files</Text>
+              </View>
+
+              <View style={styles.progressTrack}>
+                <View style={styles.progressFill} />
+              </View>
+
+              <Text style={styles.storageMeta}>SnippetVault local storage</Text>
+            </View>
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.filterRow}
+            >
+              {filters.map((filter) => {
+                const active = activeFilter === filter;
+
+                return (
+                  <Pressable
+                    key={filter}
+                    onPress={() => setActiveFilter(filter)}
+                    style={[
+                      styles.filterChip,
+                      active && styles.filterChipActive,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.filterText,
+                        active && styles.filterTextActive,
+                      ]}
+                    >
+                      {filter}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+
+            {filteredFolders.map((folder) => (
+              <Pressable key={folder.id} style={styles.folderCard}>
+                <View style={styles.folderIcon}>
+                  <Ionicons name="folder" size={28} color="#4DD0E1" />
+                </View>
+
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.folderTitle}>{folder.name}</Text>
+
+                  <Text style={styles.folderMeta}>
+                    {folder.items} items • {folder.updated}
+                  </Text>
+                </View>
+              </Pressable>
+            ))}
+          </>
+        }
+        renderItem={({ item }) => (
+          <Pressable
+            style={styles.fileCard}
+            onPress={() => handleShare(item.uri)}
+            onLongPress={() => openFileMenu(item)}
+          >
+            <View style={styles.fileIcon}>
+              <Ionicons
+                name="document-text-outline"
+                size={22}
+                color="#8B5CF6"
+              />
+            </View>
+
+            <View style={{ flex: 1 }}>
+              <Text style={styles.fileName}>{item.name}</Text>
+
+              <Text style={styles.fileMeta}>
+                {Math.round(item.size / 1024)} KB
               </Text>
             </View>
-
-            <Ionicons name="ellipsis-vertical" size={20} color="#A1A1AA" />
           </Pressable>
-        ))}
-
-        <FlatList
-          data={files}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{
-            paddingTop: 20,
-            paddingBottom: 140,
-          }}
-          renderItem={({ item }) => (
-            <Pressable
-              style={styles.fileCard}
-              onPress={() => handleShare(item.uri)}
-              onLongPress={() =>
-                Alert.alert(item.name, 'Choose an action', [
-                  {
-                    text: 'Share',
-                    onPress: () => handleShare(item.uri),
-                  },
-
-                  {
-                    text: 'Rename',
-                    onPress: () => handleRename(item.uri, item.name),
-                  },
-
-                  {
-                    text: 'Delete',
-                    style: 'destructive',
-
-                    onPress: () => handleDelete(item.uri),
-                  },
-
-                  {
-                    text: 'Cancel',
-                    style: 'cancel',
-                  },
-                ])
-              }
-            >
-              <View style={styles.fileIcon}>
-                <Ionicons name="document-text-outline" size={22} color="cyan" />
-              </View>
-
-              <View
-                style={{
-                  flex: 1,
-                }}
-              >
-                <Text style={styles.fileName}>{item.name}</Text>
-
-                <Text style={styles.fileMeta}>
-                  {Math.round(item.size / 1024)} KB
-                </Text>
-              </View>
-
-              <Ionicons name="ellipsis-vertical" size={18} color="#71717A" />
-            </Pressable>
-          )}
-        />
-      </ScrollView>
+        )}
+      />
 
       <Pressable style={styles.fab}>
         <Ionicons name="add" size={34} color="#2E1065" />
