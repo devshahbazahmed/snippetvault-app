@@ -156,7 +156,7 @@ export default function SnippetDetailScreen() {
           </Text>
 
           <Pressable style={styles.copyButton} onPress={handleCopy}>
-            <Ionicons name="copy-outline" size={18} color="#C4B5FD" />
+            <Ionicons name="copy-outline" size={18} color="cyan" />
 
             <Text style={styles.copyText}>Copy</Text>
           </Pressable>
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
   },
 
   copyText: {
-    color: '#C4B5FD',
+    color: 'cyan',
     fontWeight: '700',
   },
 
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
 
   aiButton: {
     marginTop: 28,
-    backgroundColor: '#C4B5FD',
+    backgroundColor: 'white',
     borderRadius: 20,
     paddingVertical: 18,
     alignItems: 'center',

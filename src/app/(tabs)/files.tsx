@@ -246,7 +246,7 @@ export default function FilesScreen() {
       />
 
       <Pressable style={styles.fab}>
-        <Ionicons name="add" size={34} color="#2E1065" />
+        <Ionicons name="add" size={34} color="white" />
       </Pressable>
     </View>
   );
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
 
     borderRadius: 24,
 
-    backgroundColor: '#C4B5FD',
+    backgroundColor: 'darkblue',
 
     alignItems: 'center',
     justifyContent: 'center',
